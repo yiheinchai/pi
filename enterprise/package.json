@@ -1,0 +1,37 @@
+{
+	"name": "@enterprise-pi/platform",
+	"version": "0.1.0",
+	"private": true,
+	"description": "Generic enterprise agent platform on top of the Pi agent harness. Isolated from packages/ so upstream merges stay clean.",
+	"type": "module",
+	"bin": {
+		"enterprise-pi": "./bin/enterprise-pi.mjs"
+	},
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"cli": "tsx src/cli.ts",
+		"demo": "tsx src/cli.ts run knowledge -- \"What is the PTO policy?\"",
+		"demo:coding": "tsx src/cli.ts run internal-tools -- \"How does approval routing work for a $5000 expense?\"",
+		"serve": "tsx src/cli.ts serve",
+		"test": "tsx --test test/*.test.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"engines": {
+		"node": ">=22.14.0"
+	},
+	"dependencies": {
+		"@earendil-works/pi-agent-core": "0.85.1",
+		"@earendil-works/pi-ai": "0.85.1",
+		"typebox": "1.3.27"
+	},
+	"devDependencies": {
+		"@types/node": "22.19.19",
+		"tsx": "4.22.1",
+		"typescript": "5.9.3"
+	},
+	"overrides": {
+		"typebox": "1.3.27"
+	}
+}

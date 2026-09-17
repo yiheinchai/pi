@@ -1,0 +1,8 @@
+{
+	"name": "expense-approver",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"test": "node --check src/routing.ts src/app.ts"
+	}
+}
