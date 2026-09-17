@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 export type TemplateName = "blank" | "knowledge" | "sales" | "support" | "internal-tools";
 
 const TEMPLATES: Record<TemplateName, string> = {
-	blank: `import { defineAgent, tool } from "../../src/index.ts";
+	blank: `import { defineAgent, tool } from "#platform";
 import { Type } from "typebox";
 
 export default defineAgent({
@@ -28,7 +28,7 @@ export default defineAgent({
 `,
 	knowledge: `import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 const corpusDir = join(dirname(fileURLToPath(import.meta.url)), "corpus");
 
@@ -43,7 +43,7 @@ export default defineAgent({
 `,
 	sales: `import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 const dataPath = join(dirname(fileURLToPath(import.meta.url)), "data", "crm.json");
 
@@ -62,7 +62,7 @@ export default defineAgent({
 `,
 	support: `import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -81,7 +81,7 @@ export default defineAgent({
 `,
 	"internal-tools": `import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "workspace");
 

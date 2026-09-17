@@ -1,6 +1,6 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "workspace");
 

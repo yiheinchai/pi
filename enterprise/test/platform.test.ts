@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
 import { Type } from "typebox";
 import { defaultAgentsDir } from "../src/cli.ts";
 import { defineAgent } from "../src/define-agent.ts";
@@ -58,14 +58,20 @@ describe("registry", () => {
 
 describe("scaffold", () => {
 	it("writes a runnable blank agent", async () => {
-		const root = mkdtempSync(join(tmpdir(), "enterprise-pi-"));
-		const dir = scaffoldAgent({ agentsDir: root, id: "finance-bot", template: "blank" });
-		assert.match(readFileSync(join(dir, "agent.ts"), "utf8"), /id: "finance-bot"/);
-		const definition = await loadAgent(root, "finance-bot");
-		const runtime = createRuntime(definition);
-		const result = await runtime.prompt("ping please");
-		assert.equal(result.toolCalls.some((call) => call.name === "ping"), true);
-		assert.match(result.text.toLowerCase(), /pong/);
+		const root = join(fileURLToPath(new URL("..", import.meta.url)), ".tmp-agents");
+		mkdirSync(root, { recursive: true });
+		const id = `tmp-finance-${process.pid}`;
+		const dir = scaffoldAgent({ agentsDir: root, id, template: "blank" });
+		try {
+			assert.match(readFileSync(join(dir, "agent.ts"), "utf8"), new RegExp(`id: "${id}"`));
+			const definition = await loadAgent(root, id);
+			const runtime = createRuntime(definition);
+			const result = await runtime.prompt("ping please");
+			assert.equal(result.toolCalls.some((call) => call.name === "ping"), true);
+			assert.match(result.text.toLowerCase(), /pong/);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
 	});
 });
 

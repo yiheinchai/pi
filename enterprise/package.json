@@ -10,6 +10,9 @@
 	"exports": {
 		".": "./src/index.ts"
 	},
+	"imports": {
+		"#platform": "./src/index.ts"
+	},
 	"scripts": {
 		"cli": "tsx src/cli.ts",
 		"demo": "tsx src/cli.ts run knowledge -- \"What is the PTO policy?\"",

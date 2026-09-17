@@ -1,4 +1,4 @@
-export default `import { defineAgent, tool } from "../../src/index.ts";
+export default `import { defineAgent, tool } from "#platform";
 import { Type } from "typebox";
 
 export default defineAgent({

@@ -43,7 +43,7 @@ npx tsx src/cli.ts new finance --template knowledge
 Or write one file:
 
 ```ts
-import { defineAgent, kits, policy } from "../../src/index.ts";
+import { defineAgent, kits, policy } from "#platform";
 
 export default defineAgent({
   id: "finance",

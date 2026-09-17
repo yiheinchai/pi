@@ -17,7 +17,7 @@ This writes `agents/my-agent/agent.ts`. The CLI loads every `agents/*/agent.ts` 
 ## 2. Minimum file
 
 ```ts
-import { defineAgent, tool, policy } from "../../src/index.ts";
+import { defineAgent, tool, policy } from "#platform";
 import { Type } from "typebox";
 
 export default defineAgent({
