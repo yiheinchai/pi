@@ -1,0 +1,20 @@
+{
+	"tickets": [
+		{
+			"id": "TCK-1042",
+			"title": "Cannot reset SSO password",
+			"status": "waiting",
+			"requester": "alex@blueharbor.example",
+			"priority": "high",
+			"body": "Customer is stuck on the SSO reset loop after the IdP cutover."
+		},
+		{
+			"id": "TCK-2001",
+			"title": "Invoice does not match seat count",
+			"status": "in_progress",
+			"requester": "finance@acme.example",
+			"priority": "normal",
+			"body": "August invoice shows 80 seats; contract is 60."
+		}
+	]
+}

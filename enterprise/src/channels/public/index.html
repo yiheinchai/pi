@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Enterprise Pi</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #101218;
+			--panel: #181c27;
+			--muted: #9aa4b8;
+			--text: #eef2ff;
+			--accent: #7c9cff;
+			--line: #2a3142;
+		}
+		* { box-sizing: border-box; }
+		html, body { margin: 0; height: 100%; font: 15px/1.45 ui-sans-serif, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+		.app { display: grid; grid-template-columns: 280px 1fr; height: 100%; }
+		aside { border-right: 1px solid var(--line); padding: 20px; background: var(--panel); overflow: auto; }
+		h1 { font-size: 18px; margin: 0 0 8px; }
+		.lede { color: var(--muted); margin: 0 0 20px; }
+		.agent { width: 100%; text-align: left; border: 1px solid var(--line); background: #121623; color: var(--text); border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; }
+		.agent.active { border-color: var(--accent); }
+		.agent b { display: block; margin-bottom: 4px; }
+		.agent span { color: var(--muted); font-size: 13px; }
+		main { display: grid; grid-template-rows: 1fr auto; min-width: 0; }
+		.log { padding: 24px; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
+		.bubble { max-width: 720px; padding: 12px 14px; border-radius: 12px; white-space: pre-wrap; }
+		.user { align-self: flex-end; background: #2b3550; }
+		.assistant { background: #1b2130; border: 1px solid var(--line); }
+		.tool { align-self: stretch; color: var(--muted); font-family: ui-monospace, monospace; font-size: 13px; }
+		form { display: flex; gap: 8px; padding: 16px 24px 24px; border-top: 1px solid var(--line); }
+		input { flex: 1; border-radius: 10px; border: 1px solid var(--line); background: #121623; color: var(--text); padding: 12px 14px; }
+		button { border: 0; border-radius: 10px; background: var(--accent); color: #0b1020; font-weight: 700; padding: 12px 16px; cursor: pointer; }
+		.empty { color: var(--muted); margin: auto; }
+	</style>
+</head>
+<body>
+	<div class="app">
+		<aside>
+			<h1>Enterprise Pi</h1>
+			<p class="lede">Generic agents on the Pi harness. Customer support is one app, not the product.</p>
+			<div id="agents"></div>
+		</aside>
+		<main>
+			<div class="log" id="log"><div class="empty">Choose an agent and ask it something it can look up.</div></div>
+			<form id="form">
+				<input id="message" placeholder="Ask the selected agent…" autocomplete="off" />
+				<button type="submit">Send</button>
+			</form>
+		</main>
+	</div>
+	<script>
+		const agentsEl = document.getElementById("agents");
+		const logEl = document.getElementById("log");
+		const form = document.getElementById("form");
+		const input = document.getElementById("message");
+		let agents = [];
+		let current = null;
+		const sessions = {};
+
+		function addBubble(role, text) {
+			const empty = logEl.querySelector(".empty");
+			if (empty) empty.remove();
+			const div = document.createElement("div");
+			div.className = "bubble " + role;
+			div.textContent = text;
+			logEl.appendChild(div);
+			logEl.scrollTop = logEl.scrollHeight;
+			return div;
+		}
+
+		function renderAgents() {
+			agentsEl.innerHTML = "";
+			for (const agent of agents) {
+				const button = document.createElement("button");
+				button.className = "agent" + (current === agent.id ? " active" : "");
+				button.innerHTML = "<b></b><span></span>";
+				button.querySelector("b").textContent = agent.title;
+				button.querySelector("span").textContent = agent.description;
+				button.onclick = () => {
+					current = agent.id;
+					logEl.innerHTML = "";
+					addBubble("assistant", "Ready. This agent uses Pi Agent + enterprise tools and policies.");
+					renderAgents();
+				};
+				agentsEl.appendChild(button);
+			}
+		}
+
+		async function loadAgents() {
+			const response = await fetch("/api/agents");
+			const body = await response.json();
+			agents = body.agents || [];
+			if (agents[0]) current = agents[0].id;
+			renderAgents();
+		}
+
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			if (!current) return;
+			const text = input.value.trim();
+			if (!text) return;
+			input.value = "";
+			addBubble("user", text);
+			const assistant = addBubble("assistant", "");
+			const response = await fetch("/api/agents/" + current + "/turns", {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ message: text, sessionId: sessions[current] }),
+			});
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let buffer = "";
+			while (true) {
+				const { value, done } = await reader.read();
+				if (done) break;
+				buffer += decoder.decode(value, { stream: true });
+				const parts = buffer.split("\n\n");
+				buffer = parts.pop() || "";
+				for (const part of parts) {
+					const eventName = (part.match(/^event: (.+)$/m) || [])[1];
+					const dataLine = (part.match(/^data: (.+)$/m) || [])[1];
+					if (!eventName || !dataLine) continue;
+					const data = JSON.parse(dataLine);
+					if (eventName === "session") sessions[current] = data.sessionId;
+					if (eventName === "tool_start") addBubble("tool", data.name + " " + JSON.stringify(data.args));
+					if (eventName === "text_delta") assistant.textContent += data.text || "";
+					if (eventName === "done" && !assistant.textContent) assistant.textContent = data.text || "";
+					if (eventName === "error") assistant.textContent = data.error || "error";
+					logEl.scrollTop = logEl.scrollHeight;
+				}
+			}
+		});
+
+		loadAgents();
+	</script>
+</body>
+</html>

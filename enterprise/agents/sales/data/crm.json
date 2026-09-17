@@ -1,0 +1,54 @@
+{
+	"accounts": [
+		{
+			"id": "acme",
+			"name": "Acme Manufacturing",
+			"tier": "enterprise",
+			"owner": "Jordan Lee",
+			"arr": 240000,
+			"region": "NA"
+		},
+		{
+			"id": "blue-harbor",
+			"name": "Blue Harbor Clinics",
+			"tier": "mid-market",
+			"owner": "Sam Ortiz",
+			"arr": 48000,
+			"region": "NA"
+		},
+		{
+			"id": "globex",
+			"name": "Globex Logistics",
+			"tier": "enterprise",
+			"owner": "Priya Shah",
+			"arr": 180000,
+			"region": "EMEA"
+		}
+	],
+	"opportunities": [
+		{
+			"id": "opp-1",
+			"accountId": "acme",
+			"name": "Acme platform renewal",
+			"amount": 240000,
+			"stage": "negotiate",
+			"closeDate": "2026-11-15"
+		},
+		{
+			"id": "opp-2",
+			"accountId": "blue-harbor",
+			"name": "Clinics expansion seats",
+			"amount": 18000,
+			"stage": "qualify",
+			"closeDate": "2026-10-01"
+		}
+	],
+	"activities": [
+		{
+			"id": "act-1",
+			"accountId": "acme",
+			"note": "Renewal QBR scheduled.",
+			"at": "2026-09-01T15:00:00.000Z"
+		}
+	]
+}
